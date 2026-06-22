@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyPlan AI | Your Intelligent Academic Concierge</title>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Toast Notifications Overlay -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- AUTHENTICATION WRAPPER -->
+    <div id="auth-wrapper" class="auth-wrapper">
+        <div class="auth-container glass-panel">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <div class="logo-icon"><i data-lucide="brain"></i></div>
+                    <span>StudyPlan AI</span>
+                </div>
+                <p id="auth-subtitle">Elevate your study routine with AI power</p>
+            </div>
+
+            <!-- Tabs to toggle signin / signup -->
+            <div class="ai-output-tabs" style="margin-bottom: 24px;">
+                <button class="tab-btn active" id="tab-login" onclick="toggleAuthTab('login')">Sign In</button>
+                <button class="tab-btn" id="tab-register" onclick="toggleAuthTab('register')">Create Account</button>
+            </div>
+
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <div class="form-group" id="group-fullname" style="display: none;">
+                    <label class="form-label" for="fullname">Full Name</label>
+                    <input class="form-input" type="text" id="fullname" placeholder="Renuka Jyothi">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input class="form-input" type="email" id="email" required placeholder="renuka@nitk.edu.in">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input class="form-input" type="password" id="password" required placeholder="••••••••">
+                </div>
+                <div class="form-group" id="group-major" style="display: none;">
+                    <label class="form-label" for="major">Degree & Branch / Class</label>
+                    <input class="form-input" type="text" id="major" placeholder="B.Tech Computer Science">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="auth-btn">Sign In</button>
+            </form>
+
+            <div style="margin-top: 24px; text-align: center; font-size: 0.85rem; color: var(--text-secondary);">
+                <p>Demo Account: <strong>renuka@nitk.edu.in</strong> / <strong>password123</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app-wrapper" class="app-container" style="display: none;">
+        <!-- SIDEBAR -->
+        <aside class="app-sidebar glass-panel">
+            <div class="sidebar-top">
+                <div class="sidebar-header">
+                    <div class="logo-icon"><i data-lucide="brain"></i></div>
+                    <span class="logo-text">StudyPlan AI</span>
+                </div>
+                <ul class="sidebar-menu">
+                    <li><a class="sidebar-link active" onclick="switchView('dashboard')" id="link-dashboard"><i data-lucide="layout-dashboard"></i> <span>Dashboard</span></a></li>
+                    <li><a class="sidebar-link" onclick="switchView('study-vault')" id="link-study-vault"><i data-lucide="folder-open"></i> <span>Study Vault</span></a></li>
+                    <li><a class="sidebar-link" onclick="switchView('quiz-flashcards')" id="link-quiz-flashcards"><i data-lucide="help-circle"></i> <span>Practice & Quizzes</span></a></li>
+                    <li><a class="sidebar-link" onclick="switchView('planner')" id="link-planner"><i data-lucide="calendar"></i> <span>Academic Planner</span></a></li>
+                    <li><a class="sidebar-link" onclick="switchView('ai-chat')" id="link-ai-chat"><i data-lucide="message-square"></i> <span>AI Chat Assistant</span></a></li>
+                    <li><a class="sidebar-link" onclick="switchView('analytics')" id="link-analytics"><i data-lucide="bar-chart-2"></i> <span>Goals & Analytics</span></a></li>
+                    <li><a class="sidebar-link" onclick="switchView('settings')" id="link-settings"><i data-lucide="settings"></i> <span>Settings</span></a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-profile" onclick="switchView('settings')">
+                <div class="avatar" id="sidebar-avatar-container">
+                    <i data-lucide="user" id="sidebar-avatar-placeholder"></i>
+                    <img src="" id="sidebar-avatar-img" style="display: none;" alt="Avatar">
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-username">Renuka Jyothi</div>
+                    <div class="user-major" id="sidebar-major">B.Tech Computer Science & Engineering</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN MAIN -->
+        <main class="app-main">
+            <!-- App Header -->
+            <header class="app-header">
+                <div class="header-title-area">
+                    <h1 id="header-greeting">Hello, Renuka!</h1>
+                    <p id="header-date">Today is Monday, June 22, 2026</p>
+                </div>
+                <div class="header-actions">
+                    <div class="voice-badge" id="voice-badge" onclick="toggleVoiceListening()">
+                        <i data-lucide="mic"></i> <span id="voice-status">Voice Command</span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="handleLogout()"><i data-lucide="log-out"></i> Logout</button>
+                </div>
+            </header>
+
+            <!-- VIEWS -->
+
+            <!-- VIEW: DASHBOARD -->
+            <section id="view-dashboard" class="app-view active">
+                <!-- Welcome Widget -->
+                <div class="glass-panel dash-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(0, 255, 255, 0.05)); border-color: rgba(99, 102, 241, 0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h2 style="font-size: 1.6rem; margin-bottom: 8px;">Ready for today's studies?</h2>
+                            <p style="color: var(--text-secondary); max-width: 550px;">Your AI agent analyzed your upcoming Calculus exam. We recommend studying "Integration by Parts" today to stay on track.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="switchView('study-vault')">Open Study Vault</button>
+                    </div>
+                </div>
+
+                <!-- Stats Counters Grid -->
+                <div class="quick-stats-grid">
+                    <div class="glass-panel stat-item">
+                        <div class="stat-icon primary"><i data-lucide="book-open"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-val" id="stat-uploaded-count">0</span>
+                            <span class="stat-lbl">Notes Uploaded</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel stat-item">
+                        <div class="stat-icon success"><i data-lucide="clock"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-val" id="stat-study-time">0h 0m</span>
+                            <span class="stat-lbl">Focus Time</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel stat-item">
+                        <div class="stat-icon warning"><i data-lucide="award"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-val" id="stat-gpa">9.0</span>
+                            <span class="stat-lbl">Target CGPA</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel stat-item">
+                        <div class="stat-icon danger"><i data-lucide="calendar"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-val" id="stat-next-deadline">None</span>
+                            <span class="stat-lbl">Next Deadline</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-grid">
+                    <!-- Left: Focus Timer & Smart Reminders -->
+                    <div class="dash-col-6 glass-panel dash-card">
+                        <h3><i data-lucide="timer" style="vertical-align: text-bottom; margin-right: 8px;"></i> Focus Stopwatch</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Track your study time. It will automatically update your performance dashboard.</p>
+                        <div class="timer-widget glass-panel">
+                            <div class="timer-digits" id="timer-display">00:00:00</div>
+                            <div class="timer-controls">
+                                <button class="btn btn-primary" id="timer-toggle-btn" onclick="toggleTimer()"><i data-lucide="play"></i> Start</button>
+                                <button class="btn btn-secondary" onclick="resetTimer()"><i data-lucide="refresh-cw"></i> Reset</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Smart Reminders -->
+                    <div class="dash-col-6 glass-panel dash-card">
+                        <h3><i data-lucide="bell" style="vertical-align: text-bottom; margin-right: 8px;"></i> Smart Agent Reminders</h3>
+                        <div style="display: flex; flex-direction: column; gap: 12px;" id="reminder-container">
+                            <!-- Reminders will load here -->
+                        </div>
+                    </div>
+
+                    <!-- Task Kanban Preview -->
+                    <div class="dash-col-8 glass-panel dash-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3><i data-lucide="check-square" style="vertical-align: text-bottom; margin-right: 8px;"></i> Upcoming Assignments</h3>
+                            <button class="btn btn-secondary" onclick="switchView('planner')">Manage Tasks</button>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;" id="dash-tasks-preview">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Quick chat helper widget -->
+                    <div class="dash-col-4 glass-panel dash-card" style="background: radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);">
+                        <h3><i data-lucide="sparkles" style="vertical-align: text-bottom; margin-right: 8px;"></i> Quick Help</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Ask your academic concierge anything instantly.</p>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button class="btn btn-secondary" onclick="quickChatAsk('What is mitosis in cell biology?')">Explain Mitosis</button>
+                            <button class="btn btn-secondary" onclick="quickChatAsk('How can I optimize recursive algorithms?')">Optimize Recursion</button>
+                            <button class="btn btn-secondary" onclick="switchView('ai-chat')">Open Main Assistant Chat</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: STUDY VAULT -->
+            <section id="view-study-vault" class="app-view">
+                <div class="dash-grid">
+                    <div class="dash-col-4 glass-panel dash-card">
+                        <h3><i data-lucide="upload-cloud" style="vertical-align: text-bottom; margin-right: 8px;"></i> Upload Material</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 8px;">Upload notes, presentations, or study files (txt, md, pdf simulated).</p>
+                        <div class="uploader-box" onclick="triggerFileUpload()">
+                            <i data-lucide="file-text"></i>
+                            <p style="font-weight: 600;">Drag files here or click to browse</p>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary);">Supports TXT, MD, PDF, PPTX (Max 25MB)</p>
+                            <input type="file" id="file-uploader" class="file-input" onchange="handleFileSelect(event)">
+                        </div>
+
+                        <div style="margin-top: 16px;">
+                            <h4 style="margin-bottom: 12px; font-size: 0.9rem;">Pre-loaded Materials (Try these!)</h4>
+                            <div class="materials-list" id="loaded-materials-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dash-col-8 glass-panel dash-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                            <h3 id="vault-doc-title">Active Document: Calculus Limits</h3>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary" onclick="generateMaterialsAction('quiz')"><i data-lucide="help-circle"></i> Create Quiz</button>
+                                <button class="btn btn-secondary" onclick="generateMaterialsAction('cards')"><i data-lucide="layers"></i> Create Flashcards</button>
+                            </div>
+                        </div>
+
+                        <!-- Tab selectors for processed output -->
+                        <div class="ai-output-tabs" style="margin-top: 12px;">
+                            <button class="tab-btn active" onclick="switchVaultTab('simplified')">Simplified Content</button>
+                            <button class="tab-btn" onclick="switchVaultTab('summary')">Concise Summary</button>
+                            <button class="tab-btn" onclick="switchVaultTab('keypoints')">Key Concepts</button>
+                            <button class="tab-btn" onclick="switchVaultTab('revision')">Revision Guide</button>
+                        </div>
+
+                        <!-- Tabs Content -->
+                        <div id="tab-simplified" class="ai-tab-content active" style="margin-top: 16px;">
+                            <!-- Simplified text loaded here -->
+                        </div>
+                        <div id="tab-summary" class="ai-tab-content" style="margin-top: 16px;">
+                            <!-- Summary text loaded here -->
+                        </div>
+                        <div id="tab-keypoints" class="ai-tab-content" style="margin-top: 16px;">
+                            <!-- Key concepts loaded here -->
+                        </div>
+                        <div id="tab-revision" class="ai-tab-content" style="margin-top: 16px;">
+                            <!-- Revision guide loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: PRACTICE & QUIZZES -->
+            <section id="view-quiz-flashcards" class="app-view">
+                <div class="glass-panel dash-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(99, 102, 241, 0.03)); border-color: rgba(16, 185, 129, 0.15);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div>
+                            <h2>Practice Engine</h2>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem;">Test your recall with AI generated cards and quizzes based on study documents.</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <label class="form-label" for="practice-doc-select" style="margin: 0; white-space: nowrap;">Topic:</label>
+                            <select id="practice-doc-select" class="form-input" style="padding: 6px 12px; font-size: 0.85rem;" onchange="handlePracticeDocChange()">
+                                <!-- Dynamic options -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-grid">
+                    <!-- Interactive Flashcards -->
+                    <div class="dash-col-6 glass-panel dash-card">
+                        <h3><i data-lucide="layers" style="vertical-align: text-bottom; margin-right: 8px;"></i> Revision Flashcards</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Click the card to flip and view the answer. Test your memory.</p>
+                        
+                        <div class="flashcards-container">
+                            <div class="flashcard-wrapper">
+                                <div class="flashcard" id="flashcard-element" onclick="flipFlashcard()">
+                                    <div class="flashcard-face flashcard-front">
+                                        <span class="flashcard-category" id="card-category">Topic</span>
+                                        <span class="flashcard-content" id="card-front-content">Front side details will load here.</span>
+                                        <span class="flashcard-prompt">Click to Flip</span>
+                                    </div>
+                                    <div class="flashcard-face flashcard-back">
+                                        <span class="flashcard-category">Answer</span>
+                                        <span class="flashcard-content" id="card-back-content">Back side details will load here.</span>
+                                        <span class="flashcard-prompt">Click to Flip Back</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flashcard-controls">
+                                <button class="btn btn-secondary" onclick="prevFlashcard()"><i data-lucide="chevron-left"></i> Previous</button>
+                                <span id="card-counter" style="font-weight: 600; font-size: 0.95rem;">0 / 0</span>
+                                <button class="btn btn-secondary" onclick="nextFlashcard()">Next <i data-lucide="chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quizzes -->
+                    <div class="dash-col-6 glass-panel dash-card">
+                        <h3><i data-lucide="check-square" style="vertical-align: text-bottom; margin-right: 8px;"></i> Multiple Choice Quiz</h3>
+                        <div id="quiz-intro">
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">Think you're ready for tests? Test your knowledge with a generated 5-question quiz.</p>
+                            <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+                        </div>
+                        <div id="quiz-active" style="display: none;" class="quiz-box">
+                            <div class="quiz-progress-bar">
+                                <div class="quiz-progress-fill" id="quiz-progress-indicator"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary);">
+                                <span id="quiz-question-counter">Question 1 of 5</span>
+                                <span id="quiz-score-live">Score: 0/0</span>
+                            </div>
+                            <div class="quiz-question" id="quiz-question-text">
+                                Question contents?
+                            </div>
+                            <div class="quiz-options-list" id="quiz-options-container">
+                                <!-- Dynamic MCQ options -->
+                            </div>
+                            <button class="btn btn-primary" id="quiz-next-btn" style="align-self: flex-end; margin-top: 12px; display: none;" onclick="submitQuizOption()">Next Question</button>
+                        </div>
+                        <div id="quiz-result" style="display: none; text-align: center; padding: 20px 0;">
+                            <i data-lucide="award" style="font-size: 3rem; color: var(--warning); margin-bottom: 12px;"></i>
+                            <h4 style="font-size: 1.4rem; margin-bottom: 8px;">Quiz Completed!</h4>
+                            <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 16px;">You Scored: <span id="quiz-final-score" style="color: var(--accent-color);">0 / 0</span> (<span id="quiz-percentage">0%</span>)</p>
+                            <div style="display: flex; justify-content: center; gap: 10px;">
+                                <button class="btn btn-primary" onclick="startQuiz()">Retake Quiz</button>
+                                <button class="btn btn-secondary" onclick="switchView('analytics')">View Progress Analytics</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: ACADEMIC PLANNER -->
+            <section id="view-planner" class="app-view">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Academic Planner</h2>
+                    <button class="btn btn-primary" onclick="openCreateTaskModal()"><i data-lucide="plus"></i> Add Event / Task</button>
+                </div>
+
+                <div class="dash-grid">
+                    <!-- Calendar Panel -->
+                    <div class="dash-col-8 glass-panel dash-card">
+                        <div class="calendar-widget">
+                            <div class="calendar-header">
+                                <h3 id="calendar-title">June 2026</h3>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="prevCalendarMonth()"><i data-lucide="chevron-left"></i></button>
+                                    <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="nextCalendarMonth()"><i data-lucide="chevron-right"></i></button>
+                                </div>
+                            </div>
+                            <div class="calendar-grid" id="calendar-grid-container">
+                                <!-- Days Labels -->
+                                <div class="calendar-day-label">Sun</div>
+                                <div class="calendar-day-label">Mon</div>
+                                <div class="calendar-day-label">Tue</div>
+                                <div class="calendar-day-label">Wed</div>
+                                <div class="calendar-day-label">Thu</div>
+                                <div class="calendar-day-label">Fri</div>
+                                <div class="calendar-day-label">Sat</div>
+                                <!-- Cells filled dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side info & Upcoming Deadlines -->
+                    <div class="dash-col-4 glass-panel dash-card">
+                        <h3>Upcoming Events</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 12px;">Automated schedule based on project and exam dates.</p>
+                        <div style="display: flex; flex-direction: column; gap: 12px;" id="upcoming-events-list">
+                            <!-- Dynamic checklist of upcoming test dates -->
+                        </div>
+                    </div>
+
+                    <!-- Kanban Board Organizer -->
+                    <div class="dash-col-12 glass-panel dash-card">
+                        <h3><i data-lucide="kanban" style="vertical-align: text-bottom; margin-right: 8px;"></i> Project & Assignment Tracker</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">Drag and drop assignments to update status. Keep projects organized.</p>
+                        
+                        <div class="kanban-board">
+                            <!-- TODO -->
+                            <div class="kanban-col glass-panel" style="background: rgba(0, 0, 0, 0.08);">
+                                <div class="kanban-col-header">
+                                    <span>To Do</span>
+                                    <span class="kanban-badge" id="kanban-todo-count">0</span>
+                                </div>
+                                <div class="kanban-cards-container" id="kanban-todo" ondragover="allowDrop(event)" ondrop="drop(event, 'todo')">
+                                    <!-- Kanban cards dynamic -->
+                                </div>
+                            </div>
+
+                            <!-- IN PROGRESS -->
+                            <div class="kanban-col glass-panel" style="background: rgba(0, 0, 0, 0.08);">
+                                <div class="kanban-col-header">
+                                    <span>In Progress</span>
+                                    <span class="kanban-badge" id="kanban-progress-count">0</span>
+                                </div>
+                                <div class="kanban-cards-container" id="kanban-progress" ondragover="allowDrop(event)" ondrop="drop(event, 'progress')">
+                                    <!-- Kanban cards dynamic -->
+                                </div>
+                            </div>
+
+                            <!-- REVIEW -->
+                            <div class="kanban-col glass-panel" style="background: rgba(0, 0, 0, 0.08);">
+                                <div class="kanban-col-header">
+                                    <span>Review / Draft</span>
+                                    <span class="kanban-badge" id="kanban-review-count">0</span>
+                                </div>
+                                <div class="kanban-cards-container" id="kanban-review" ondragover="allowDrop(event)" ondrop="drop(event, 'review')">
+                                    <!-- Kanban cards dynamic -->
+                                </div>
+                            </div>
+
+                            <!-- COMPLETED -->
+                            <div class="kanban-col glass-panel" style="background: rgba(0, 0, 0, 0.08);">
+                                <div class="kanban-col-header">
+                                    <span>Completed</span>
+                                    <span class="kanban-badge" id="kanban-completed-count">0</span>
+                                </div>
+                                <div class="kanban-cards-container" id="kanban-completed" ondragover="allowDrop(event)" ondrop="drop(event, 'completed')">
+                                    <!-- Kanban cards dynamic -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: AI CHAT ASSISTANT -->
+            <section id="view-ai-chat" class="app-view">
+                <div class="dash-grid">
+                    <!-- Left: Chat Panel -->
+                    <div class="dash-col-8 glass-panel dash-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                            <h3><i data-lucide="bot" style="vertical-align: text-bottom; color: var(--accent-color); margin-right: 8px;"></i> Ask StudyPlan AI</h3>
+                            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" onclick="clearChatHistory()"><i data-lucide="trash-2"></i> Clear History</button>
+                        </div>
+
+                        <div class="chat-container">
+                            <div class="chat-history" id="chat-history-container">
+                                <!-- Pre-populated greeting message from AI -->
+                            </div>
+                            <div class="chat-input-area">
+                                <input class="chat-input" id="chat-user-input" type="text" placeholder="Ask about uploaded notes, projects, exam schedules, or academic concepts..." onkeydown="handleChatKeyDown(event)">
+                                <button class="voice-chat-btn" id="voice-chat-mic" onclick="toggleChatVoiceInput()"><i data-lucide="mic"></i></button>
+                                <button class="btn btn-primary" onclick="submitChatMessage()"><i data-lucide="send"></i> Send</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Context Helper -->
+                    <div class="dash-col-4 glass-panel dash-card">
+                        <h3>AI Knowledge Context</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 12px;">StudyPlan AI answers queries based on your active document resources.</p>
+                        
+                        <div class="glass-panel" style="padding: 16px; margin-bottom: 16px;">
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase;">Active Topic Context</span>
+                            <h4 id="chat-context-topic" style="margin-top: 4px; color: var(--accent-color);">Calculus: Limits & Derivatives</h4>
+                        </div>
+
+                        <h4>Sample Prompts to Try</h4>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+                            <button class="btn btn-secondary" style="text-align: left; font-size: 0.8rem;" onclick="quickChatAsk('Synthesize my notes in a 3-sentence summary.')">"Synthesize my notes into a summary"</button>
+                            <button class="btn btn-secondary" style="text-align: left; font-size: 0.8rem;" onclick="quickChatAsk('Draft a study schedule for my upcoming exam.')">"Draft an exam study plan"</button>
+                            <button class="btn btn-secondary" style="text-align: left; font-size: 0.8rem;" onclick="quickChatAsk('Generate 3 practice questions for cell division.')">"Generate practice questions"</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: ANALYTICS & GOALS -->
+            <section id="view-analytics" class="app-view">
+                <h2>Goals & Performance Analytics</h2>
+
+                <!-- Goal progress rings rows -->
+                <div class="quick-stats-grid">
+                    <div class="glass-panel" style="display: flex; align-items: center; justify-content: space-around; padding: 16px;">
+                        <div class="progress-ring">
+                            <svg class="progress-ring-svg" width="90" height="90">
+                                <circle class="progress-ring-circle" stroke="var(--border-color)" stroke-width="8" fill="transparent" r="36" cx="45" cy="45"/>
+                                <circle class="progress-ring-circle" id="ring-study-hours" stroke="var(--accent-color)" stroke-width="8" fill="transparent" r="36" cx="45" cy="45" stroke-dasharray="226.19" stroke-dashoffset="226.19"/>
+                            </svg>
+                            <div class="progress-ring-val" id="ring-study-hours-text">0%</div>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 0.95rem;">Focus Target</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.75rem;"><span id="analytics-focus-hours">0</span> / <span id="analytics-focus-goal">15</span> hrs</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel" style="display: flex; align-items: center; justify-content: space-around; padding: 16px;">
+                        <div class="progress-ring">
+                            <svg class="progress-ring-svg" width="90" height="90">
+                                <circle class="progress-ring-circle" stroke="var(--border-color)" stroke-width="8" fill="transparent" r="36" cx="45" cy="45"/>
+                                <circle class="progress-ring-circle" id="ring-quiz-score" stroke="var(--success)" stroke-width="8" fill="transparent" r="36" cx="45" cy="45" stroke-dasharray="226.19" stroke-dashoffset="226.19"/>
+                            </svg>
+                            <div class="progress-ring-val" id="ring-quiz-text">0%</div>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 0.95rem;">Avg Quiz Score</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.75rem;">Based on quiz attempts</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel" style="display: flex; align-items: center; justify-content: space-around; padding: 16px;">
+                        <div class="progress-ring">
+                            <svg class="progress-ring-svg" width="90" height="90">
+                                <circle class="progress-ring-circle" stroke="var(--border-color)" stroke-width="8" fill="transparent" r="36" cx="45" cy="45"/>
+                                <circle class="progress-ring-circle" id="ring-tasks" stroke="var(--warning)" stroke-width="8" fill="transparent" r="36" cx="45" cy="45" stroke-dasharray="226.19" stroke-dashoffset="226.19"/>
+                            </svg>
+                            <div class="progress-ring-val" id="ring-tasks-text">0%</div>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 0.95rem;">Tasks Finished</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.75rem;"><span id="analytics-tasks-done">0</span> / <span id="analytics-tasks-total">0</span> done</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel" style="display: flex; align-items: center; justify-content: space-around; padding: 16px;">
+                        <div class="progress-ring">
+                            <svg class="progress-ring-svg" width="90" height="90">
+                                <circle class="progress-ring-circle" stroke="var(--border-color)" stroke-width="8" fill="transparent" r="36" cx="45" cy="45"/>
+                                <circle class="progress-ring-circle" id="ring-materials" stroke="var(--danger)" stroke-width="8" fill="transparent" r="36" cx="45" cy="45" stroke-dasharray="226.19" stroke-dashoffset="226.19"/>
+                            </svg>
+                            <div class="progress-ring-val" id="ring-materials-text">0%</div>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 0.95rem;">Active Topics</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.75rem;">Processed subjects</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-grid">
+                    <!-- SVG Chart 1: Study hours per day -->
+                    <div class="dash-col-6 glass-panel dash-card">
+                        <h3>Weekly Study Distribution</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 12px;">Hours spent studying each day this week.</p>
+                        <div class="chart-container-svg">
+                            <svg class="chart-svg" id="analytics-weekly-chart" viewBox="0 0 500 240">
+                                <defs>
+                                    <linearGradient id="chart-bar-gradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="var(--accent-color)"/>
+                                        <stop offset="100%" stop-color="var(--accent-hover)" stop-opacity="0.6"/>
+                                    </linearGradient>
+                                </defs>
+                                <!-- Chart background grids & axes -->
+                                <line x1="40" y1="20" x2="40" y2="200" class="chart-axis"/>
+                                <line x1="40" y1="200" x2="480" y2="200" class="chart-axis"/>
+                                <!-- Gridlines -->
+                                <line x1="40" y1="155" x2="480" y2="155" class="chart-gridline"/>
+                                <line x1="40" y1="110" x2="480" y2="110" class="chart-gridline"/>
+                                <line x1="40" y1="65" x2="480" y2="65" class="chart-gridline"/>
+                                
+                                <text x="15" y="160" class="chart-text">1.0h</text>
+                                <text x="15" y="115" class="chart-text">2.0h</text>
+                                <text x="15" y="70" class="chart-text">3.0h</text>
+                                
+                                <!-- Columns -->
+                                <g id="chart-bars-container">
+                                    <!-- Dynamic bars -->
+                                </g>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- SVG Chart 2: Subject Mastery Progression -->
+                    <div class="dash-col-6 glass-panel dash-card">
+                        <h3>Subject Progression Curves</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 12px;">Progression tracking quiz score growth over time.</p>
+                        <div class="chart-container-svg">
+                            <svg class="chart-svg" id="analytics-progression-chart" viewBox="0 0 500 240">
+                                <defs>
+                                    <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="var(--accent-color)"/>
+                                        <stop offset="100%" stop-color="var(--bg-primary)" stop-opacity="0"/>
+                                    </linearGradient>
+                                </defs>
+                                <line x1="40" y1="20" x2="40" y2="200" class="chart-axis"/>
+                                <line x1="40" y1="200" x2="480" y2="200" class="chart-axis"/>
+                                <!-- Gridlines -->
+                                <line x1="40" y1="155" x2="480" y2="155" class="chart-gridline"/>
+                                <line x1="40" y1="110" x2="480" y2="110" class="chart-gridline"/>
+                                <line x1="40" y1="65" x2="480" y2="65" class="chart-gridline"/>
+                                
+                                <text x="15" y="160" class="chart-text">50%</text>
+                                <text x="15" y="115" class="chart-text">75%</text>
+                                <text x="15" y="70" class="chart-text">90%</text>
+                                
+                                <!-- Grid Axis Marks -->
+                                <text x="40" y="215" class="chart-text">Quiz 1</text>
+                                <text x="150" y="215" class="chart-text">Quiz 2</text>
+                                <text x="260" y="215" class="chart-text">Quiz 3</text>
+                                <text x="370" y="215" class="chart-text">Quiz 4</text>
+                                <text x="470" y="215" class="chart-text">Quiz 5</text>
+                                
+                                <!-- Chart Areas / Paths -->
+                                <path id="analytics-line-area" class="chart-area" d=""/>
+                                <path id="analytics-line-path" class="chart-line" d=""/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Recommended Learning Resources -->
+                    <div class="dash-col-12 glass-panel dash-card">
+                        <h3>Recommended Learning Resources</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 12px;">Based on your active study categories and CGPA targets.</p>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;" id="recommender-grid">
+                            <!-- Filled dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: SETTINGS -->
+            <section id="view-settings" class="app-view">
+                <h2>Profile Settings & Customization</h2>
+                
+                <div class="dash-grid">
+                    <!-- Profile settings -->
+                    <div class="dash-col-6 glass-panel dash-card">
+                        <h3>Personal Profile</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Update details that direct your personalized academic concierges.</p>
+                        
+                        <form id="profile-settings-form" onsubmit="saveProfileSettings(event)" style="margin-top: 16px;">
+                            <div class="form-group">
+                                <label class="form-label" for="settings-fullname">Full Name</label>
+                                <input class="form-input" type="text" id="settings-fullname" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="settings-major">Degree & Branch / Class</label>
+                                <input class="form-input" type="text" id="settings-major" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="settings-avatar">Profile Picture / Avatar URL</label>
+                                <input class="form-input" type="text" id="settings-avatar" placeholder="https://images.unsplash.com/...">
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div class="form-group">
+                                    <label class="form-label" for="settings-gpagoal">Target CGPA</label>
+                                    <input class="form-input" type="number" id="settings-gpagoal" step="0.1" min="0" max="10.0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="settings-hoursgoal">Study Goal (Hours/Week)</label>
+                                    <input class="form-input" type="number" id="settings-hoursgoal" min="1" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="margin-top: 12px;">Save Profile Details</button>
+                        </form>
+                    </div>
+
+                    <!-- Themes & custom UI -->
+                    <div class="dash-col-6 glass-panel dash-card">
+                        <h3>Interface Styling</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">Customize color schemes and study space background layouts.</p>
+                        
+                        <div class="pref-row">
+                            <div>
+                                <div class="pref-label">Color Themes</div>
+                                <div class="pref-desc">Switch core dashboard palettes</div>
+                            </div>
+                            <div class="theme-picker">
+                                <div class="theme-dot active" style="background: #6366f1;" title="Dark Mode" onclick="setTheme('dark')"></div>
+                                <div class="theme-dot" style="background: #3b82f6;" title="Light Mode" onclick="setTheme('light')"></div>
+                                <div class="theme-dot" style="background: #8b5cf6;" title="Pastel Lavender" onclick="setTheme('pastel')"></div>
+                                <div class="theme-dot" style="background: #ff007f;" title="Cyberpunk Neon" onclick="setTheme('cyberpunk')"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <h4 style="margin-bottom: 12px; font-size: 0.95rem;">Dashboard Background Space</h4>
+                            <div class="bg-options" id="bg-presets-container">
+                                <!-- Background thumbs filled dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="pref-row" style="margin-top: 20px;">
+                            <div>
+                                <div class="pref-label">System Notifications</div>
+                                <div class="pref-desc">Send calendar reminders to your desktop screen.</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="requestNotificationAccess()">Enable Alerts</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL LAYER: CREATE TASK / PLANNED EVENT -->
+    <div class="modal-overlay" id="create-task-modal">
+        <div class="modal-content glass-panel" style="background: var(--bg-secondary); border-color: var(--border-color);">
+            <div class="modal-close" onclick="closeCreateTaskModal()"><i data-lucide="x"></i></div>
+            <h3 style="margin-bottom: 20px;" id="task-modal-title"><i data-lucide="calendar" style="vertical-align: text-bottom; margin-right: 8px;"></i> Create Academic Task</h3>
+            
+            <form onsubmit="handleCreateTaskSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label" for="task-title">Title</label>
+                    <input class="form-input" type="text" id="task-title" required placeholder="Calculus Exam 1, Biology Project Report">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="task-description">Short Details</label>
+                    <textarea class="form-input" id="task-description" placeholder="Summarize what needs to be studied or prepared" style="resize: none; height: 80px;"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label class="form-label" for="task-date">Date / Deadline</label>
+                        <input class="form-input" type="date" id="task-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="task-category">Category</label>
+                        <select class="form-input" id="task-category">
+                            <option value="exam">Exam Prep</option>
+                            <option value="project">Project / Group Work</option>
+                            <option value="homework">Homework Assignment</option>
+                            <option value="study">General Study Session</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 10px;">
+                    <label class="form-label" for="task-board-status">Planner Board Placement</label>
+                    <select class="form-input" id="task-board-status">
+                        <option value="todo">To Do</option>
+                        <option value="progress">In Progress</option>
+                        <option value="review">Review / Draft</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Save Task & Update Scheduler</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODULE SCRIPTS -->
+    <script src="auth.js"></script>
+    <script src="notesProcessor.js"></script>
+    <script src="quizFlashcards.js"></script>
+    <script src="studySchedule.js"></script>
+    <script src="projectsGoals.js"></script>
+    <script src="chatAgent.js"></script>
+    <script src="analytics.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
