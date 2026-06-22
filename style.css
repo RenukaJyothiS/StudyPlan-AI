@@ -347,8 +347,10 @@ h1, h2, h3, h4, h5, h6 {
     transition: all var(--transition-fast);
 }
 
-.sidebar-link i {
+.sidebar-link i, .sidebar-link svg {
     font-size: 1.15rem;
+    width: 1.15rem;
+    height: 1.15rem;
 }
 
 .sidebar-link:hover, .sidebar-link.active {
