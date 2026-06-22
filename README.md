@@ -1,4 +1,4 @@
-# StudyPlan AI | Your Intelligent Academic Concierge (Indian Version)
+# StudyPlan AI | Your Intelligent Academic Concierge 
 
 StudyPlan AI is a sleek, single-page application (SPA) dashboard designed to elevate students' academic study routines. Localized for the Indian academic system, this concierge utilizes a 10.0 CGPA scale, provides CBSE Board and B.Tech CSE level study guides, and includes an interactive AI chat assistant with integrated voice navigation.
 
