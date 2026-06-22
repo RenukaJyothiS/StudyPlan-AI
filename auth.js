@@ -120,6 +120,7 @@ function handleAuthSubmit(event) {
 function showAuthInterface() {
     document.getElementById("auth-wrapper").style.display = "flex";
     document.getElementById("app-wrapper").style.display = "none";
+    lucide.createIcons();
 }
 
 function showAppInterface(user) {
